@@ -79,6 +79,7 @@ function drawMap() {
                 const modalBodyTimeInfo = document.createElement('div');
                 modalBodyTimeInfo.classList.add('modal-body-timeInfo');
                 
+                
                 modalBody.appendChild(modalBodyTimeInfo);
                 modalBody.appendChild(modalBodyUserInfo);
                 modalBody.appendChild(modalBodyCarInfo);
