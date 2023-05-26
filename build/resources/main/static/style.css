@@ -1,0 +1,241 @@
+#wrap {
+    display: flex;
+}
+#slider, #parkingLotStatus-section {
+    border: 1px solid #ccc;
+    overflow: auto;
+    padding: 0 30px;
+}
+#wrap h3 {
+    display: flex;
+    justify-content: center;
+    margin: 30px 0 50px 0;
+}
+#parkingLotStatus-section {
+    width: 60%;
+    height: 100vh;
+}
+#parking-map {
+    overflow-y: auto;
+    height: 80%;
+}
+#parking-map::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera*/
+}
+
+#slider {
+    width: 40%;
+    height: 100vh;
+    overflow: hidden;
+    position: relative;
+}
+.slide-section {
+    overflow-y: auto;
+    height: 88%;
+}
+.slide-section::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera*/
+}
+
+
+.simple-time {
+    margin-right: 14px;
+}
+.lp-image-div {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+.lp-image {
+    max-width: 360px;
+}
+.entry-exit-time {
+    margin: 26px 0 24px 0;
+}
+.entry-exit-time > p {
+    padding: 0 10px;
+    margin: 10px 0;
+}
+.entry-exit-time .entry-time {
+    color: blue;
+}
+.entry-exit-time .entry-time::before {
+    display: inline-block;
+    content: "+";
+    width: 24px;
+    text-align: center;
+}
+.entry-exit-time .exit-time {
+    color: red;
+}
+.entry-exit-time .exit-time::before {
+    display: inline-block;
+    content: "-";
+    width: 24px;
+    text-align: center;
+}
+.entry-exit-time .exit-btn-container {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 10px;
+}
+.resize-bar {
+    width: 10px; /* 바의 너비 */
+    cursor: col-resize;
+    background-color: #ccc;
+}
+
+#parking-map {
+    display: flex;
+    justify-content: center;
+    padding: 10px;
+}
+#parking-map::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera*/
+}
+
+.map-col {
+    width: 60px;
+    display: flex;
+    flex-direction: column;
+}
+
+.spot {
+    width: 70px;
+    height: 70px;
+    margin: 3px;
+    border-radius: 5px;
+    line-height: 50px;
+    text-align: center;
+    cursor: pointer;
+}
+.btn-primary.unoccupied {
+    background-color: transparent;
+    color: black;
+}
+.btn-primary.unoccupied:hover {
+    background-color: #0d6efd;
+    color: white;
+}
+.btn-primary.occupied {
+    background-color: #0d6efd;
+}
+.btn-primary.occupied:hover {
+    background-color: #0b5ed7;
+}
+
+
+/* 신고페이지 */
+#reportStatus-section {
+    width: 100%;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    transition: top .5s ease;
+    overflow: auto;
+    background-color: white;
+    padding: 0 30px;
+}
+#reportStatus-section::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera*/
+}
+#reportStatus-section.slide-up {
+    top: 0;
+}
+
+.func-btn {
+    position: absolute;
+    right: 10px;
+    z-index: 10;
+    width: 50px;
+    height: 50px;
+    line-height: 50px;
+    text-align: center;
+    font-size: 24px;
+    color: #0d6efd;
+}
+.func-btn:hover {
+    color: #0c4db0;
+}
+#reportSection-toggle.func-btn {
+    bottom: 10px
+}
+#member-search-btn.func-btn {
+    bottom: 50px;
+}
+
+.modal-body {
+    padding: 0 26px;
+}
+.modal-body > div {
+    padding: 0 12px;
+}
+.modal-body-timeInfo {
+    color: #0d6efd;
+}
+.modal-body-timeInfo, .modal-body-carInfo {
+    height: 50px;
+    line-height: 50px;
+}
+.modal-body > div:not(div:last-child) {
+    border-bottom: 1px solid #dee2e6;
+}
+.modal-body-userInfo p {
+    height: 40px;
+    line-height: 40px;
+}
+.modal-body-userInfo p:first-child::before {
+    content:"아이디: ";
+    height: 40px;
+    line-height: 40px;
+}
+.modal-body-userInfo p:first-child::before::after {
+    width: 1px;
+    height: 10px;
+    border-left: solid 1px black;
+}
+.modal-body-userInfo p:last-child::before {
+    content:"이름: ";
+    height: 40px;
+    line-height: 40px;
+}
+.modal-body-carInfo::before {
+    content:"차량번호: ";
+    height: 50px;
+    line-height: 50px;
+}
+
+/* 신고리스트 */
+#reportStatus-container .accordion-body > .report-title .report-content .report-user-body {
+    height: 40px;
+    line-height: 40px;
+}
+.rerpot-cancel-btn-container {
+    display: flex;
+    justify-content: end;
+}
+.report-image-div {
+    margin: 20px 0;
+}
+
+/* 회원 정보 오프캔버스 */
+#search-form {
+    margin-bottom: 44px;
+}
+#search-input-container{
+    margin: 14px 0 24px 0;
+}
+
+#search-result > p {
+    margin-bottom: 10px;
+    padding-left: 8px;
+}
+
+#user-violation-container {
+    display: flex;
+    justify-content: end;
+    margin-top: 40px;
+}
+#user-violation-container > button {
+    margin-left: 5px;
+}

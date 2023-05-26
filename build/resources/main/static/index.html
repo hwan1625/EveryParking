@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>관리자페이지</title>
+  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js" integrity="sha512-iKDtgDyTHjAitUDdLljGhenhPwrbBfqTKWO1mkhSFH3A7blITC9MhYon6SjnMhp4o0rADGw9yAC6EW4t5a4K3g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="./reset.css">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <div id="wrap">
+    <div id="slider">
+      <section id="logStatus-section" class="slide-section">
+        <h3>주차장 출입 현황</h3>
+        <div class="accordion" id="logStatus-container"></div>
+      </section>
+      <i type="button" id="member-search-btn" class="func-btn fa-solid fa-magnifying-glass" data-bs-toggle="offcanvas" data-bs-target="#memberSearchSection" aria-controls="memberSearchSection"></i>
+      <i type="button" id="reportSection-toggle" class="func-btn fa-regular fa-newspaper"></i>
+      <section id="reportStatus-section" class="slide-section">
+        <h3>신고 현황</h3>
+        <div class="accordion" id="reportStatus-container"></div>
+      </section>
+    </div>
+    
+    <div class="resize-bar"></div>
+    
+    <div id="parkingLotStatus-section">
+      <h3>주차장 좌석 현황</h3>
+      <div id="parking-map"></div>
+    </div>
+    
+  </div>
+
+  <!-- 실시간 알람 -->
+  <div id='logToast' class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="toast-header">
+        <i class="fa-solid fa-bell" style="margin-right: 16px;"></i>
+        <strong class="me-auto" id="logToast-title"></strong>
+        <small class="text-muted" id="logToast-when">now</small>
+        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+      <div class="toast-body" id="logToast-content"></div>
+    </div>
+  </div>
+
+  <!-- 회원 조회(위약처리)-오프캔버스 -->
+  <div class="offcanvas offcanvas-start" data-bs-scroll="true" tabindex="-1" id="memberSearchSection" aria-labelledby="memberSearchSectionLabel">
+    <div class="offcanvas-header">
+      <h3 class="offcanvas-title" id="memberSearchSectionLabel">회원 조회</h3>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+      <div id="search-form">
+        <div id="search-findBy-option">
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="findBy" id="findByUserId" value="userId">
+            <label class="form-check-label" for="findByUserId">아이디로 검색</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="findBy" id="findByCarNumber" value="carNumber">
+            <label class="form-check-label" for="findByCarNumber">차량 번호로 검색</label>
+          </div>
+        </div>
+        <div class="input-group mb-3" id="search-input-container">
+          <input type="text" class="form-control" placeholder="정보를 입력하세요" aria-label="Recipient's username" aria-describedby="search-submit-btn">
+          <button class="btn btn-outline-secondary" type="button" id="search-submit-btn">Button</button>
+        </div>
+      </div>
+      <div id="search-result">
+        <p class="search-no-result active">검색 결과 없음</p>
+        <p class="search-result-userId"></p>
+        <p class="search-result-email"></p>
+        <p class="search-result-userName"></p>
+        <p class="search-result-studentId"></p>
+        <p class="search-result-phoneNumber"></p>
+        <p class="search-result-carNumber"></p>
+        <p class="search-result-modelName"></p>
+        <p class="search-result-userStatus"></p>
+      </div>
+      <div id="user-violation-container" style="display: none;">
+        <button id="user-violation-unregister-btn" type="button" class="btn btn-outline-primary btn-sm">위약 해제</button>
+        <button id="user-violation-register-btn" type="button" class="btn btn-danger btn-sm">위약</button>
+      </div>
+    </div>
+  </div>
+  <script type="module" src="./getRealTimeStatus.js"></script>
+  <script type="module" src="./getStatus.js"></script>
+  <script src="./utils.js"></script>
+
+</body>
+</html>
