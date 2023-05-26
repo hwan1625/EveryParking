@@ -183,6 +183,10 @@ public class ParkingServiceImpl implements ParkingService {
             Member member = memberRepository.findByUserId(userId).orElseThrow(
                 () -> new UserNotFoundException("사용자를 찾을 수 없음")
             );
+            /*이미 배정 받은 상태면 안됨*/
+            if (member.getParkingInfo() != null) {
+                throw new Exception("해당 유저는 이미 자리를 배정받은 상태임.");
+            }
 
             /*TODO 사용자 위약 정보 체크해서 배정 허가*/
             ParkingInfo parkingInfo = parkingInfoRepository.findById(parkingInfoId).orElseThrow(
