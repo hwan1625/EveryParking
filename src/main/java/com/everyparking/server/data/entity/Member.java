@@ -63,7 +63,7 @@ public class Member extends BaseTime {
 
     @OneToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "parkingInfo_id")
-    private ParkingInfo parkingInfo;
+    private ParkingInfo parkingInfo = null;
 
     public Member() {
 

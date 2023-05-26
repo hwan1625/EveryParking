@@ -11,7 +11,10 @@ import com.everyparking.server.data.entity.Member;
 import com.everyparking.server.data.entity.ParkingLot;
 import com.everyparking.server.data.repository.MemberRepository;
 import com.everyparking.server.event.EntryLogChangeEvent;
+import com.everyparking.server.exception.ParkingInfoException;
 import com.everyparking.server.service.ParkingService;
+import java.util.HashMap;
+import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -46,6 +49,7 @@ public class ParkingController {
     public ResponseEntity<?> myParkingStatus(HttpServletRequest request) {
         String userId = request.getHeader("userId").toString();
         log.info("[ParkingController] userId : {}", userId);
+        HashMap<String, String> response = new HashMap<>();
 
         /*TODO 남은 시간 계산 로직 추가*/
 
@@ -53,12 +57,24 @@ public class ParkingController {
             MyParkingStatus result = parkingService.findByUserId(userId);
             log.info("[{}] {}", this.getClass().getName(), result.toString());
 
-            return status(HttpStatus.OK)
-                .body(result);
+//            if (result == null) {
+//                return status(HttpStatus.NOT_FOUND).body("자리 배정 필요");
+//            } else{
+//                return status(HttpStatus.OK)
+//                    .body(result);
+//            }
 
+            return status(HttpStatus.OK).body(result);
+
+        } catch (ParkingInfoException e) {
+            log.info("[{}] {}", this.getClass().getName(), e.toString());
+            response.put("message", e.toString());
+            return status(HttpStatus.NOT_FOUND).body(response);
         } catch (Exception e) {
-            log.info("[ParkingController] {}", e.getMessage());
-            return status(HttpStatus.NOT_FOUND).build();
+            log.info("[ParkingController] {}", e.toString());
+            response.put("message", e.toString());
+
+            return status(HttpStatus.NOT_FOUND).body(response);
         }
     }
 

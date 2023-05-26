@@ -96,7 +96,7 @@ public class InitData {
     }
 
     private ParkingLot initParkingLot() {
-        ParkingLot parkingLot = ParkingLot.builder().name("테스트").total(20).used(0).available(20 - 0)
+        ParkingLot parkingLot = ParkingLot.builder().name("테스트").total(56).used(0).available(20 - 0)
             .build();
 
         parkingLotRepository.save(parkingLot);

@@ -59,7 +59,7 @@ public class ParkingInfo extends BaseTime {
     }
 
     public MyParkingStatus toDto() {
-        log.info("[{}]", this.getClass().getName());
+//        log.info("[{}]", this.getClass().getName());
 
         MyParkingStatus result = MyParkingStatus.builder()
             .parkingId(this.getParkingId())
@@ -69,6 +69,8 @@ public class ParkingInfo extends BaseTime {
             )
             .carNumber(this.getCar().getCarNumber())
             .build();
+
+        log.info("[{}] result : {}", this.getClass().getName(), result.toString());
 
         return result;
     }
@@ -83,7 +85,7 @@ public class ParkingInfo extends BaseTime {
         // 분으로 변환
         int minutes = (int) duration.toMinutes();
 
-        log.info("[{}] remain : {}", this.getClass().getName(), minutes);
+//        log.info("[{}] remain : {}", this.getClass().getName(), minutes);
 
         return minutes;
     }
