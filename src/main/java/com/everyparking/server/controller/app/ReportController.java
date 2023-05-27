@@ -30,11 +30,12 @@ public class ReportController {
     @PostMapping(value = "/upload", consumes = {MediaType.APPLICATION_JSON_VALUE,
         MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<?> upload(
-        @RequestPart(name = "data") ReportDto reportDto,
+        @RequestPart(name = "title") String title,
+        @RequestPart(name = "contents") String contents,
         @RequestPart(name = "imageFile") MultipartFile imageFile, HttpServletRequest request) {
 
         String userId = request.getHeader("userId");
-
+        ReportDto reportDto = ReportDto.builder().title(title).contents(contents).build();
         try {
             reportService.uploadReport(userId, reportDto, imageFile);
 

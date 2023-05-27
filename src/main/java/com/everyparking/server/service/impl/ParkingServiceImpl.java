@@ -194,7 +194,11 @@ public class ParkingServiceImpl implements ParkingService {
                 throw new Exception("해당 유저는 이미 자리를 배정받은 상태임.");
             }
 
-            /*TODO 사용자 위약 정보 체크해서 배정 허가*/
+            /*사용자 위약 정보 체크*/
+            if (member.getMemberStatus() == MemberStatus.FORBIDDEN) {
+                throw new Exception("해당 유저는 위약 상태입니다.");
+            }
+
             ParkingInfo parkingInfo = parkingInfoRepository.findById(parkingInfoId).orElseThrow(
                     () -> new ParkingInfoException("ParkingInfo Error")
             );
@@ -205,12 +209,10 @@ public class ParkingServiceImpl implements ParkingService {
                     () -> new Exception("일치하는 차량번호가 존재하지 않음.")
             );
 
-
-
             /*해제해 이거*/
-//            if (!car.getCarEnterStatus().isEnter()) {
-//                throw new Exception("차량이 주차장 내에 존재하지 않음.");
-//            }
+            if (!car.getCarEnterStatus().isEnter()) {
+                throw new Exception("차량이 주차장 내에 존재하지 않음.");
+            }
 
 //            member.assignParking(parkingInfo);
             member.changeParkingStatus(parkingInfo);
@@ -269,34 +271,30 @@ public class ParkingServiceImpl implements ParkingService {
             parkingLotRepository.save(parkingLot);
 
 
+            /*반납할 때 출차 기록 및 관리자에게 알람*/
+            String carNumber = member.getCar().getCarNumber();
+            Optional<EntryLog> found = entryLogRepository.findFirstByCarNumberAndExitTimeIsNull(carNumber);
+            if(found.isEmpty()) {
+                throw new Exception("들어온 기록이 없음.");
+            }
+            EntryLog updated = found.get();
+            ZoneId zoneId = ZoneId.of("Asia/Seoul");
+            ZonedDateTime zonedDateTime = ZonedDateTime.now(zoneId);
+            updated.setExitTime(zonedDateTime.toLocalDateTime());
+            entryLogRepository.save(updated);
+            eventPublisher.publishEvent(new EntryLogChangeEvent(updated.toDto()));
+            log.info("[{}] 관리자에게 출차 알람", this.getClass().getName());
 
-            /*여기까지는 반납 처리 됨*/
 
-
-//            /*반납할 때 출차 기록 및 관리자에게 알람*/
-//            String carNumber = member.getCar().getCarNumber();
-//            Optional<EntryLog> found = entryLogRepository.findFirstByCarNumberAndExitTimeIsNull(carNumber);
-//            if(found.isEmpty()) {
-//                throw new Exception("들어온 기록이 없음.");
-//            }
-//            EntryLog updated = found.get();
-//            ZoneId zoneId = ZoneId.of("Asia/Seoul");
-//            ZonedDateTime zonedDateTime = ZonedDateTime.now(zoneId);
-//            updated.setExitTime(zonedDateTime.toLocalDateTime());
-//            entryLogRepository.save(updated);
-//            eventPublisher.publishEvent(new EntryLogChangeEvent(updated.toDto()));
-//            log.info("[{}] 관리자에게 출차 알람", this.getClass().getName());
-//
-//
-//            // car is_entered 업데이트
-//            // Car 엔티티 @Setter 추가
-//            Optional<Car> found2 = carRepository.findByCarNumber(carNumber);
-//            if (found2.isEmpty()) {
-//                throw new Exception("error");
-//            }
-//            Car updated2 = found2.get();
-//            updated2.setCarEnterStatus(new CarEnterStatus(-1, false));
-//            carRepository.save(updated2);
+            // car is_entered 업데이트
+            // Car 엔티티 @Setter 추가
+            Optional<Car> found2 = carRepository.findByCarNumber(carNumber);
+            if (found2.isEmpty()) {
+                throw new Exception("error");
+            }
+            Car updated2 = found2.get();
+            updated2.setCarEnterStatus(new CarEnterStatus(-1, false));
+            carRepository.save(updated2);
 
 
 
