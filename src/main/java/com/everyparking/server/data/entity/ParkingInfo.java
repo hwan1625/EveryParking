@@ -72,6 +72,8 @@ public class ParkingInfo extends BaseTime {
 
         log.info("[{}] result : {}", this.getClass().getName(), result.toString());
 
+        log.info("[{}] result : {}", this.getClass().getName(), result.toString());
+
         return result;
     }
 
