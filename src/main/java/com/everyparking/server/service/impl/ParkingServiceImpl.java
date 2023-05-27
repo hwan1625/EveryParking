@@ -3,6 +3,7 @@ package com.everyparking.server.service.impl;
 import com.everyparking.server.data.dto.CarDto;
 import com.everyparking.server.data.dto.MemberDto.UserParkingInfo;
 import com.everyparking.server.data.dto.ParkingDto;
+import com.everyparking.server.data.dto.ParkingDto.MyParkingStatus;
 import com.everyparking.server.data.dto.ParkingDto.ParkingInfoDto;
 import com.everyparking.server.data.dto.ParkingDto.ParkingInfoDto.Info;
 import com.everyparking.server.data.dto.ParkingDto.ParkingInfoDto.Map;
@@ -56,23 +57,28 @@ public class ParkingServiceImpl implements ParkingService {
     @Override
     public ParkingDto.MyParkingStatus findByUserId(String userId) {
 
-        try {
-            Member member = memberRepository.findByUserId(userId).orElseThrow(
-                () -> new UserNotFoundException("일치하는 사용자 없음")
-            );
 
+
+        Member member = memberRepository.findByUserId(userId).orElseThrow(
+                () -> new UserNotFoundException("사용자 정보 없음")
+        );
+
+        if (!member.checkParkingStatus()) {
+            throw new ParkingInfoException("자리를 먼저 배정하세요");
+        } else{
             ParkingInfo parkingInfo = member.getParkingInfo();
-            return parkingInfo.toDto();
 
-        } catch (UserNotFoundException e) {
-            log.info("[ParkingService] {}", e.toString());
-            throw e;
 
-        } catch (Exception e) {
-            log.info("[ParkingService] {}", e.toString());
-            throw e;
+            /*TODO 시간 처리 로직 추가*/
+            return MyParkingStatus.builder()
+                    .parkingId(parkingInfo.getParkingId())
+                    .remain(1234)
+                    .carNumber(member.getCar().getCarNumber())
+                    .build();
 
         }
+
+//
     }
 
     /*ParkingLotId로 ParkingLot 조회*/
@@ -80,7 +86,7 @@ public class ParkingServiceImpl implements ParkingService {
     public ParkingLot findParkingLotByParkingLotId(Long parkingLotId) {
         try {
             ParkingLot parkingLot = parkingLotRepository.findById(parkingLotId).orElseThrow(
-                () -> new ParkingLotException("일치하는 주차장 없음")
+                    () -> new ParkingLotException("일치하는 주차장 없음")
             );
 
             return parkingLot;
@@ -96,28 +102,28 @@ public class ParkingServiceImpl implements ParkingService {
     public ParkingDto.ParkingLotMap findParkingLotMap(ParkingLot parkingLot) {
         try {
             List<ParkingInfo> parkingInfoList = parkingInfoRepository.findAllByParkingLot(
-                    parkingLot)
-                .orElseThrow(
-                    () -> new ParkingLotException("일치하는 ParkingInfo 없음")
-                );
+                            parkingLot)
+                    .orElseThrow(
+                            () -> new ParkingLotException("일치하는 ParkingInfo 없음")
+                    );
 
             List<Map> parkingInfoDtoList = parkingInfoList.stream()
-                .map(o -> Map.builder()
-                    .id(o.getId())
-                    .parkingId(o.getParkingId())
-                    .parkingStatus(o.getParkingStatus())
-                    .build()
-                ).collect(Collectors.toList());
+                    .map(o -> Map.builder()
+                            .id(o.getId())
+                            .parkingId(o.getParkingId())
+                            .parkingStatus(o.getParkingStatus())
+                            .build()
+                    ).collect(Collectors.toList());
 
             ParkingLotMap result = ParkingLotMap.builder()
-                .id(parkingLot.getId())
-                .name(parkingLot.getName())
-                .total(parkingLot.getTotal())
-                .used(parkingLot.getUsed())
-                .parkingInfoList(
-                    parkingInfoDtoList
-                )
-                .build();
+                    .id(parkingLot.getId())
+                    .name(parkingLot.getName())
+                    .total(parkingLot.getTotal())
+                    .used(parkingLot.getUsed())
+                    .parkingInfoList(
+                            parkingInfoDtoList
+                    )
+                    .build();
 
             return result;
 
@@ -136,37 +142,37 @@ public class ParkingServiceImpl implements ParkingService {
         try {
             /*parkingInfo 조회*/
             ParkingInfo parkingInfo = parkingInfoRepository.findById(parkingInfoId).orElseThrow(
-                () -> new ParkingInfoException("ParkingInfo 오류")
+                    () -> new ParkingInfoException("ParkingInfo 오류")
             );
 
             /*Dto 생성 후 리턴*/
             if (parkingInfo.getParkingStatus() == ParkingStatus.USED) {
                 return Info.builder()
-                    .id(parkingInfo.getId())
-                    .parkingId(parkingInfo.getParkingId())
-                    .parkingStatus(parkingInfo.getParkingStatus())
-                    .details(
-                        CarDto.ParkingInfo.builder()
-                            .id(parkingInfo.getMember().getCar().getId())
-                            .carNumber(parkingInfo.getMember().getCar().getCarNumber())
-                            .member(
-                                UserParkingInfo.builder()
-                                    .id(parkingInfo.getMember().getId())
-                                    .userId(parkingInfo.getMember().getUserId())
-                                    .userName(parkingInfo.getMember().getUserName())
-                                    .build()
-                            )
-                            .build()
-                    )
-                    .build();
+                        .id(parkingInfo.getId())
+                        .parkingId(parkingInfo.getParkingId())
+                        .parkingStatus(parkingInfo.getParkingStatus())
+                        .details(
+                                CarDto.ParkingInfo.builder()
+                                        .id(parkingInfo.getMember().getCar().getId())
+                                        .carNumber(parkingInfo.getMember().getCar().getCarNumber())
+                                        .member(
+                                                UserParkingInfo.builder()
+                                                        .id(parkingInfo.getMember().getId())
+                                                        .userId(parkingInfo.getMember().getUserId())
+                                                        .userName(parkingInfo.getMember().getUserName())
+                                                        .build()
+                                        )
+                                        .build()
+                        )
+                        .build();
 
             } else {
                 return Info.builder()
-                    .id(parkingInfo.getId())
-                    .parkingId(parkingInfo.getParkingId())
-                    .parkingStatus(parkingInfo.getParkingStatus())
-                    .details(null)
-                    .build();
+                        .id(parkingInfo.getId())
+                        .parkingId(parkingInfo.getParkingId())
+                        .parkingStatus(parkingInfo.getParkingStatus())
+                        .details(null)
+                        .build();
             }
 
 
@@ -181,7 +187,7 @@ public class ParkingServiceImpl implements ParkingService {
 
         try {
             Member member = memberRepository.findByUserId(userId).orElseThrow(
-                () -> new UserNotFoundException("사용자를 찾을 수 없음")
+                    () -> new UserNotFoundException("사용자를 찾을 수 없음")
             );
             /*이미 배정 받은 상태면 안됨*/
             if (member.getParkingInfo() != null) {
@@ -190,7 +196,7 @@ public class ParkingServiceImpl implements ParkingService {
 
             /*TODO 사용자 위약 정보 체크해서 배정 허가*/
             ParkingInfo parkingInfo = parkingInfoRepository.findById(parkingInfoId).orElseThrow(
-                () -> new ParkingInfoException("ParkingInfo Error")
+                    () -> new ParkingInfoException("ParkingInfo Error")
             );
 
             /*해당 차량이 주차장 내에 들어와 있는지 확인해야됨*/
@@ -198,23 +204,33 @@ public class ParkingServiceImpl implements ParkingService {
             Car car = carRepository.findByCarNumber(carNumber).orElseThrow(
                     () -> new Exception("일치하는 차량번호가 존재하지 않음.")
             );
-            if (!car.getCarEnterStatus().isEnter()) {
-                throw new Exception("차량이 주차장 내에 존재하지 않음.");
-            }
+
+
+
+            /*해제해 이거*/
+//            if (!car.getCarEnterStatus().isEnter()) {
+//                throw new Exception("차량이 주차장 내에 존재하지 않음.");
+//            }
 
 //            member.assignParking(parkingInfo);
             member.changeParkingStatus(parkingInfo);
             memberRepository.save(member);
 
+            /*parkingLot used 증가*/
+            ParkingLot parkingLot = parkingInfo.getParkingLot();
+            parkingLot.increaseUsed();
+            parkingLotRepository.save(parkingLot);
+
+
             log.info("[{}] {}번 자리 대여", this.getClass().getName(), parkingInfo.getParkingId());
 
             return
-                ParkingInfoDto.Info
-                    .builder()
-                    .parkingId(parkingInfo.getParkingId())
-                    .parkingStatus(ParkingStatus.USED)
+                    ParkingInfoDto.Info
+                            .builder()
+                            .parkingId(parkingInfo.getParkingId())
+                            .parkingStatus(ParkingStatus.USED)
 //                .details(member.)
-                    .build();
+                            .build();
 
         } catch (UserNotFoundException e) {
             log.info("[{}] {}", this.getClass().getName(), e.getMessage());
@@ -233,11 +249,11 @@ public class ParkingServiceImpl implements ParkingService {
 
         try {
             Member member = memberRepository.findByUserId(userId).orElseThrow(
-                () -> new UserNotFoundException("사용자를 찾을 수 없음")
+                    () -> new UserNotFoundException("사용자를 찾을 수 없음")
             );
 
             ParkingInfo parkingInfo = parkingInfoRepository.findById(parkingInfoId).orElseThrow(
-                () -> new ParkingInfoException("ParkingInfo Error")
+                    () -> new ParkingInfoException("ParkingInfo Error")
             );
 
             if (member.getParkingInfo() == null) {
@@ -247,30 +263,42 @@ public class ParkingServiceImpl implements ParkingService {
             member.changeParkingStatus(parkingInfo);
             memberRepository.save(member);
 
-            /*반납할 때 출차 기록 및 관리자에게 알람*/
-            String carNumber = member.getCar().getCarNumber();
-            Optional<EntryLog> found = entryLogRepository.findFirstByCarNumberAndExitTimeIsNull(carNumber);
-            if(found.isEmpty()) {
-                throw new Exception("들어온 기록이 없음.");
-            }
-            EntryLog updated = found.get();
-            ZoneId zoneId = ZoneId.of("Asia/Seoul");
-            ZonedDateTime zonedDateTime = ZonedDateTime.now(zoneId);
-            updated.setExitTime(zonedDateTime.toLocalDateTime());
-            entryLogRepository.save(updated);
-            eventPublisher.publishEvent(new EntryLogChangeEvent(updated.toDto()));
-            log.info("[{}] 관리자에게 출차 알람", this.getClass().getName());
+            /*parkingLot used 감소*/
+            ParkingLot parkingLot = parkingInfo.getParkingLot();
+            parkingLot.decreaseUsed();
+            parkingLotRepository.save(parkingLot);
 
 
-            // car is_entered 업데이트
-            // Car 엔티티 @Setter 추가
-            Optional<Car> found2 = carRepository.findByCarNumber(carNumber);
-            if (found2.isEmpty()) {
-                throw new Exception("error");
-            }
-            Car updated2 = found2.get();
-            updated2.setCarEnterStatus(new CarEnterStatus(-1, false));
-            carRepository.save(updated2);
+
+            /*여기까지는 반납 처리 됨*/
+
+
+//            /*반납할 때 출차 기록 및 관리자에게 알람*/
+//            String carNumber = member.getCar().getCarNumber();
+//            Optional<EntryLog> found = entryLogRepository.findFirstByCarNumberAndExitTimeIsNull(carNumber);
+//            if(found.isEmpty()) {
+//                throw new Exception("들어온 기록이 없음.");
+//            }
+//            EntryLog updated = found.get();
+//            ZoneId zoneId = ZoneId.of("Asia/Seoul");
+//            ZonedDateTime zonedDateTime = ZonedDateTime.now(zoneId);
+//            updated.setExitTime(zonedDateTime.toLocalDateTime());
+//            entryLogRepository.save(updated);
+//            eventPublisher.publishEvent(new EntryLogChangeEvent(updated.toDto()));
+//            log.info("[{}] 관리자에게 출차 알람", this.getClass().getName());
+//
+//
+//            // car is_entered 업데이트
+//            // Car 엔티티 @Setter 추가
+//            Optional<Car> found2 = carRepository.findByCarNumber(carNumber);
+//            if (found2.isEmpty()) {
+//                throw new Exception("error");
+//            }
+//            Car updated2 = found2.get();
+//            updated2.setCarEnterStatus(new CarEnterStatus(-1, false));
+//            carRepository.save(updated2);
+
+
 
             log.info("[{}] {}번 자리 반납", this.getClass().getName(), parkingInfo.getParkingId());
             log.info("[{}] {}번 출차 기록", this.getClass().getName(), parkingInfo.getParkingId());

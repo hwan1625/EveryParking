@@ -47,24 +47,24 @@ public class InitData {
 
         /*FORBIDDEN 테스트용 사용자*/
         Member member1 = initMember(
-            "testUser",
-            "4567",
-            "테스트유저",
-            "test@a.com",
-            00000000,
-            MemberStatus.DEFAULT);
+                "testUser",
+                "4567",
+                "테스트유저",
+                "test@a.com",
+                00000000,
+                MemberStatus.DEFAULT);
         member1.registerCar(initCar());
 
         memberRepository.save(member1);
 
         /*기본 사용자 등록*/
         memberRepository.save(initMember(
-            "1",
-            "1234",
-            "테스트 사용자",
-            "1@naver.com",
-            12341234,
-            MemberStatus.DEFAULT
+                "1",
+                "1234",
+                "테스트 사용자",
+                "1@naver.com",
+                12341234,
+                MemberStatus.DEFAULT
         ));
 
 
@@ -72,32 +72,32 @@ public class InitData {
 
     /*사용자 위약처리*/
     private Member initMember(String userId, String pwd, String userName, String email,
-        int phoneNumber, MemberStatus memberStatus) {
+                              int phoneNumber, MemberStatus memberStatus) {
         return memberRepository.save(
-            Member.builder().userId(userId).password(pwd).userName(userName).roleType(RoleType.USER)
-                .userInfo(UserInfo.builder().email(email).phoneNumber(phoneNumber).build())
-                .memberStatus(memberStatus).build());
+                Member.builder().userId(userId).password(pwd).userName(userName).roleType(RoleType.USER)
+                        .userInfo(UserInfo.builder().email(email).phoneNumber(phoneNumber).build())
+                        .memberStatus(memberStatus).build());
     }
 
     private void initAdmin() {
 
         memberRepository.save(Member.builder().userId("admin").password("1234").userName("관리자")
-            .roleType(RoleType.ADMIN)
-            .userInfo(UserInfo.builder().email("admin@a.com").phoneNumber(12341234).build())
-            .memberStatus(MemberStatus.DEFAULT).build());
+                .roleType(RoleType.ADMIN)
+                .userInfo(UserInfo.builder().email("admin@a.com").phoneNumber(12341234).build())
+                .memberStatus(MemberStatus.DEFAULT).build());
     }
 
     private void initParkingInfo(ParkingLot parkingLot) {
         for (int i = 1; i <= 56; i++) {
             parkingInfoRepository.save(
-                ParkingInfo.builder().parkingId(i).parkingStatus(ParkingStatus.AVAILABLE)
-                    .parkingLot(parkingLot).build());
+                    ParkingInfo.builder().parkingId(i).parkingStatus(ParkingStatus.AVAILABLE)
+                            .parkingLot(parkingLot).build());
         }
     }
 
     private ParkingLot initParkingLot() {
-        ParkingLot parkingLot = ParkingLot.builder().name("테스트").total(20).used(0).available(20 - 0)
-            .build();
+        ParkingLot parkingLot = ParkingLot.builder().name("테스트").total(56).used(0).available(20 - 0)
+                .build();
 
         parkingLotRepository.save(parkingLot);
 
@@ -120,7 +120,7 @@ public class InitData {
 
     private static Car makeCar(String carNumber, String modelName) {
         Car car = Car.builder().carNumber(carNumber).modelName(modelName)
-            .carStatus(CarStatus.APPROVED).carEnterStatus(new CarEnterStatus(-1, false)).build();
+                .carStatus(CarStatus.APPROVED).carEnterStatus(new CarEnterStatus(-1, false)).build();
         return car;
     }
 

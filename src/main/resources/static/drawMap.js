@@ -2,6 +2,12 @@ import config from "./config.js";
 
 function drawMap() {
     let spotNum = 0;
+    let spotMap = [
+        'B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8', 'B9', 'B10', 'B11', 'B12', 'B13', 'B14', 'B15', 'B16',
+        'B17', 'B18', 'B19', 'B20', 'B21', 'B22', 'B23', 'B24', 'B25', 'B26', 'B27', 'B28', 'B29',
+        'A15', 'A16', 'A17', 'A18', 'A19', 'A20', 'A21', 'A22', 'A23', 'A24', 'A25', 'A26', 'A27',
+        'A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8', 'A9', 'A10', 'A11', 'A12', 'A13', 'A14'
+                ]
     const parkingMap = document.getElementById('parking-map');
     for(let j=0; j < 6; j++) {
         const col = document.createElement('div');
@@ -20,7 +26,7 @@ function drawMap() {
             } else {
                 spot.setAttribute('data-bs-toggle', 'modal');
                 spot.setAttribute('data-bs-target', `#modal-info-${++spotNum}`)
-                spot.textContent = spotNum;
+                spot.textContent = spotMap[spotNum-1];
                 spot.id = `info-${spotNum}`;
 
                 // 모달 요소 생성

@@ -40,4 +40,14 @@ public class ParkingLot extends BaseTime {
     public ParkingLot() {
     }
 
+    public void increaseUsed() {
+        this.used++;
+    }
+
+    public void decreaseUsed() {
+        if (this.used > 0) {
+            this.used--;
+        }
+    }
+
 }

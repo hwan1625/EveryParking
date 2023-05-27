@@ -11,7 +11,10 @@ import com.everyparking.server.data.entity.Member;
 import com.everyparking.server.data.entity.ParkingLot;
 import com.everyparking.server.data.repository.MemberRepository;
 import com.everyparking.server.event.EntryLogChangeEvent;
+import com.everyparking.server.exception.ParkingInfoException;
 import com.everyparking.server.service.ParkingService;
+import java.util.HashMap;
+import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -46,6 +49,7 @@ public class ParkingController {
     public ResponseEntity<?> myParkingStatus(HttpServletRequest request) {
         String userId = request.getHeader("userId").toString();
         log.info("[ParkingController] userId : {}", userId);
+        HashMap<String, String> response = new HashMap<>();
 
         /*TODO 남은 시간 계산 로직 추가*/
 
@@ -53,12 +57,24 @@ public class ParkingController {
             MyParkingStatus result = parkingService.findByUserId(userId);
             log.info("[{}] {}", this.getClass().getName(), result.toString());
 
-            return status(HttpStatus.OK)
-                .body(result);
+//            if (result == null) {
+//                return status(HttpStatus.NOT_FOUND).body("자리 배정 필요");
+//            } else{
+//                return status(HttpStatus.OK)
+//                    .body(result);
+//            }
 
+            return status(HttpStatus.OK).body(result);
+
+        } catch (ParkingInfoException e) {
+            log.info("[{}] {}", this.getClass().getName(), e.toString());
+            response.put("message", e.toString());
+            return status(HttpStatus.NOT_FOUND).body(response);
         } catch (Exception e) {
-            log.info("[ParkingController] {}", e.getMessage());
-            return status(HttpStatus.NOT_FOUND).build();
+            log.info("[ParkingController] {}", e.toString());
+            response.put("message", e.toString());
+
+            return status(HttpStatus.NOT_FOUND).body(response);
         }
     }
 
@@ -77,13 +93,13 @@ public class ParkingController {
             ParkingLotMap parkingLotMap = parkingService.findParkingLotMap(parkingLot);
 
             return status(HttpStatus.OK)
-                .body(parkingLotMap);
+                    .body(parkingLotMap);
 
         } catch (Exception e) {
             log.info("[ParkingController] {}", e.toString());
 
             return status(HttpStatus.NOT_FOUND)
-                .build();
+                    .build();
         }
     }
 
@@ -98,13 +114,13 @@ public class ParkingController {
 
         try {
             return status(HttpStatus.OK)
-                .body(
-                    parkingService.findByParkingId(parkingInfoId));
+                    .body(
+                            parkingService.findByParkingId(parkingInfoId));
         } catch (Exception e) {
             log.info("[{}] {}", this.getClass().getName(), e.getMessage());
 
             return status(HttpStatus.BAD_REQUEST)
-                .build();
+                    .build();
         }
     }
 
@@ -126,24 +142,24 @@ public class ParkingController {
                     () -> new Exception("현재 유저는 자리를 배정 받은 상태가 아닙니다.")
             );
             eventPublisher.publishEvent(new EntryLogChangeEvent(
-                ParkingDto.ParkingInfoDto.Info.builder()
-                        .id(parkingInfo.getId())
-                        .parkingId(parkingInfo.getParkingId())
-                        .parkingStatus(parkingInfo.getParkingStatus())
-                        .details(
-                                CarDto.ParkingInfo.builder()
-                                        .id(member.getCar().getId())
-                                        .carNumber(member.getCar().getCarNumber())
-                                        .member(
-                                                MemberDto.UserParkingInfo.builder()
-                                                        .id(member.getId())
-                                                        .userId(member.getUserId())
-                                                        .userName(member.getUserName())
-                                                        .build()
-                                        )
-                                        .build()
-                        )
-                        .build()
+                    ParkingDto.ParkingInfoDto.Info.builder()
+                            .id(parkingInfo.getId())
+                            .parkingId(parkingInfo.getParkingId())
+                            .parkingStatus(parkingInfo.getParkingStatus())
+                            .details(
+                                    CarDto.ParkingInfo.builder()
+                                            .id(member.getCar().getId())
+                                            .carNumber(member.getCar().getCarNumber())
+                                            .member(
+                                                    MemberDto.UserParkingInfo.builder()
+                                                            .id(member.getId())
+                                                            .userId(member.getUserId())
+                                                            .userName(member.getUserName())
+                                                            .build()
+                                            )
+                                            .build()
+                            )
+                            .build()
             ));
 
             return status(HttpStatus.OK)
@@ -161,7 +177,7 @@ public class ParkingController {
     /*반납*/
     @GetMapping("/return/{parkingInfoId}")
     public ResponseEntity<?> parkingReturn(@PathVariable Long parkingInfoId,
-        HttpServletRequest request) {
+                                           HttpServletRequest request) {
 
         try {
             parkingService.parkingReturn(parkingInfoId, request.getHeader("userId"));
