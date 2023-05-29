@@ -55,12 +55,12 @@ stompClient.connect({}, function() {
     stompClient.subscribe('/topic/report-log', function (response) {
         let log = JSON.parse(response.body);
         console.log(log);
-        
+
         const existLogItem = document.getElementById(`reportLog-item-${log.id}`) ?? null;
         const toastLive = document.getElementById('liveToast');
         const logToastTitle = document.getElementById('logToast-title');
         const logToastContent = document.getElementById('logToast-content');
-        
+
         if (existLogItem !== null) {
             const accordionButton = existLogItem.querySelector('.accordion-button');
             accordionButton.style.color = "red";
@@ -70,10 +70,10 @@ stompClient.connect({}, function() {
             logToastContent.textContent = `신고가 처리되었습니다.`;
             const toast = new bootstrap.Toast(toastLive);
             toast.show();
-            
+
         } else {
             ReportLogListContainer.insertBefore(addReportLogItem(log), ReportLogListContainer.firstChild);
-            
+
             logToastTitle.textContent = '신고 접수';
             logToastTitle.style.color = 'blue';
             logToastContent.textContent = `신고가 접수되었습니다.`;
@@ -113,7 +113,7 @@ stompClient.connect({}, function() {
             // 위약처리 이벤트 생성
             violationButton.addEventListener('click', (e) => {
                 fetch(`http://${config.ip}/api/violation`, {
-                    method: 'GET', 
+                    method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
                         'userId': info.details.member.userId
@@ -125,7 +125,7 @@ stompClient.connect({}, function() {
                         } else {
                             throw new Error("Failed to violate user");
                         }
-                        })
+                    })
                     .catch(error => {
                         console.error('Error:', error);
                     });
@@ -137,10 +137,10 @@ stompClient.connect({}, function() {
             modalBodyCarInfo.textContent = `${info.details.carNumber}`;
             let currentTime = new Date();
             modalBodyTimeInfo.textContent = `${currentTime.getHours().toString().padStart(2, '0')}:${currentTime.getMinutes().toString().padStart(2, '0')}`
-            
+
             logToastTitle.textContent = '배정';
             logToastTitle.style.color = 'red';
-            logToastContent.textContent = `${info.details.carNumber}(이)가 ${info.parkingId}번에 배정되었습니다.`;
+            logToastContent.textContent = `${info.details.carNumber}(이)가 ${config.spotMap[info.parkingId-1]}번에 배정되었습니다.`;
             const toast = new bootstrap.Toast(toastLive);
             toast.show();
         }
@@ -151,7 +151,7 @@ stompClient.connect({}, function() {
         let status = JSON.parse(response.body);
         const searchResultContainer = document.getElementById('search-result');
         const resultUserStatus = searchResultContainer.querySelector('.search-result-userStatus');
-    
+
         const toastLive = document.getElementById('liveToast');
         const logToastTitle = document.getElementById('logToast-title');
         const logToastContent = document.getElementById('logToast-content');
