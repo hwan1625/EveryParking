@@ -4,6 +4,7 @@ import com.everyparking.server.data.entity.Car;
 import com.everyparking.server.data.entity.CarEnterStatus;
 import com.everyparking.server.data.entity.CarStatus;
 import com.everyparking.server.data.entity.Member;
+import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Data;
 
@@ -44,6 +45,8 @@ public class CarDto {
         private String carNumber;
 
         private MemberDto.UserParkingInfo member;
+
+        private LocalDateTime time;
     }
 
 

@@ -39,33 +39,33 @@ public class InitData {
     @PostConstruct
     private void initData() {
 
-        initAdmin();
+//        initAdmin();
 
 //        initCar();
 
-        initParkingInfo(initParkingLot());
+//        initParkingInfo(initParkingLot());
 
         /*FORBIDDEN 테스트용 사용자*/
-        Member member1 = initMember(
-                "testUser",
-                "4567",
-                "테스트유저",
-                "test@a.com",
-                00000000,
-                MemberStatus.DEFAULT);
-        member1.registerCar(initCar());
-
-        memberRepository.save(member1);
-
-        /*기본 사용자 등록*/
-        memberRepository.save(initMember(
-                "1",
-                "1234",
-                "테스트 사용자",
-                "1@naver.com",
-                12341234,
-                MemberStatus.DEFAULT
-        ));
+//        Member member1 = initMember(
+//                "testUser",
+//                "4567",
+//                "테스트유저",
+//                "test@a.com",
+//                00000000,
+//                MemberStatus.DEFAULT);
+//        member1.registerCar(initCar());
+//
+//        memberRepository.save(member1);
+//
+//        /*기본 사용자 등록*/
+//        memberRepository.save(initMember(
+//                "1",
+//                "1234",
+//                "테스트 사용자",
+//                "1@naver.com",
+//                12341234,
+//                MemberStatus.DEFAULT
+//        ));
 
 
     }
